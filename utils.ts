@@ -23,8 +23,6 @@ export const firebaseConfig = {
  * @description FirebaseAppを返す
  */
 export const getFirebaseApp = (): FirebaseApp | undefined => {
-  console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-
   if (typeof window === 'undefined') return; // バックエンドで実行されないようにする
 
   return getApps()[0] || initializeApp(firebaseConfig);
