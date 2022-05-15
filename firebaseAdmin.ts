@@ -19,3 +19,5 @@ export const firebaseAdmin =
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
+
+export const signOut = async (): Promise<void> => {};

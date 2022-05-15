@@ -1,9 +1,7 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import nookies from 'nookies';
+import Router, { useRouter } from 'next/router';
 import { useState } from 'react';
-import { firebaseAdmin } from '../firebaseAdmin';
 import { logout } from '../utils';
 
 const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
@@ -25,7 +23,7 @@ const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
       </Head>
       <div className='h-100 d-flex justify-content-center align-items-center'>
         <div className='card'>
-          <h1 className='card-header fs-6'>Dashboard Pages</h1>
+          <h1 className='card-header fs-6'>Dashboard</h1>
           <div className='card-body'>
             <h2 className='fs-6'>email: {email}</h2>
             <div className='mt-3 text-center'>
@@ -46,31 +44,37 @@ const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const cookies = nookies.get(ctx);
-  const session = cookies.session || '';
+DashboardPage.getInitialProps = async ({ req, res }) => {
+  const isServerSide = typeof window === 'undefined';
 
-  // セッションIDを検証して、認証情報を取得する
-  const user = await firebaseAdmin
-    .auth()
-    .verifySessionCookie(session, true)
-    .catch(() => null);
+  // バックエンドのみで動かす
+  if (isServerSide && req && res) {
+    const root = process.env.APP_URL;
+    const options = { headers: { cookie: req.headers.cookie || '' } };
 
-  // 認証情報が無い場合は、ログイン画面へ遷移させる
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
+    const result = await fetch(`${root}/api/me`, options);
+    const json = (await result.json()) as { user?: { email: string } };
+
+    // 認証情報が無ければログイン画面へリダイレクトさせる
+    if (!json.user) {
+      res.writeHead(302, { Location: '/login' });
+      res.end();
+    }
+
+    return { email: (json.user || {}).email || '' };
   }
 
-  return {
-    props: {
-      email: user.email,
-    },
-  };
+  // フロントエンドのみで動かす
+  if (!isServerSide) {
+    const result = await fetch('/api/me'); // 認証情報を取得する
+    const json = (await result.json()) as { user?: { email: string } };
+
+    // 認証情報が無ければログイン画面へリダイレクトさせる
+    if (!json.user) Router.push('/login');
+
+    return { email: (json.user || {}).email || '' };
+  }
+  return { email: '' };
 };
 
 export default DashboardPage;

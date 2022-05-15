@@ -1,6 +1,5 @@
 import { FirebaseApp, FirebaseError, getApps, initializeApp } from 'firebase/app';
 import type { Auth as FirebaseAuth } from 'firebase/auth';
-
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 /**
@@ -40,8 +39,8 @@ export const login = async (email: string, password: string): Promise<void> => {
   // FirebaseAuthを取得する
   const auth = getFirebaseAuth();
 
-  // メールアドレスとパスワードでログインする
   try {
+    // メールアドレスとパスワードでログインする
     const result = await signInWithEmailAndPassword(auth, email, password);
     // セッションIDを作成するためのIDを作成する
     const id = await result.user.getIdToken();

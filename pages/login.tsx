@@ -1,10 +1,8 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import type { FormEvent } from 'react';
-
 import { useState } from 'react';
-
 import { login } from '../utils'; // 上記で実装したファイル
 
 const LoginPage: NextPage = () => {
@@ -84,6 +82,35 @@ const LoginPage: NextPage = () => {
       </div>
     </div>
   );
+};
+
+LoginPage.getInitialProps = async ({ req, res }) => {
+  const isServerSide = typeof window === 'undefined';
+
+  // バックエンドのみで動かす
+  if (isServerSide && req && res) {
+    const root = process.env.APP_URL;
+    const options = { headers: { cookie: req.headers.cookie || '' } };
+
+    const result = await fetch(`${root}/api/me`, options);
+    const json = (await result.json()) as { user?: { email: string } };
+
+    //ログインしていればダッシュボード画面へリダイレクトさせる
+    if (json.user) {
+      res.writeHead(302, { Location: '/dashboard' });
+      res.end();
+    }
+  }
+
+  // フロントエンドのみで動かす
+  if (!isServerSide) {
+    const result = await fetch('/api/me'); // 認証情報を取得する
+    const json = (await result.json()) as { user?: { email: string } };
+
+    //ログインしていればダッシュボード画面へリダイレクトさせる
+    if (json.user) Router.push('/dashboard');
+  }
+  return {};
 };
 
 export default LoginPage;
