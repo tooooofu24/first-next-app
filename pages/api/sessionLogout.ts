@@ -13,12 +13,12 @@ export default async function sessionLogoutApi(req: Req, res: Res) {
   const sessionId = parseCookies({ req }).session || '';
 
   // セッションIDから認証情報を取得する
-  const decodedClaims = await auth.verifySessionCookie(sessionId).catch(() => null);
+  // const decodedClaims = await auth.verifySessionCookie(sessionId).catch(() => null);
 
-  // 全てのセッションを無効にする
-  if (decodedClaims) {
-    await auth.revokeRefreshTokens(decodedClaims.sub);
-  }
+  // // 全てのセッションを無効にする
+  // if (decodedClaims) {
+  //   await auth.revokeRefreshTokens(decodedClaims.sub);
+  // }
 
   // Cookieに保存されているセッションIDを削除
   destroyCookie({ res }, 'session', { path: '/' });
