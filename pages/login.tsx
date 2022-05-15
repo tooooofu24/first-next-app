@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 
 import { useState } from 'react';
 
-// import { login } from '../utils'; // 上記で実装したファイル
+import { login } from '../utils'; // 上記で実装したファイル
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
