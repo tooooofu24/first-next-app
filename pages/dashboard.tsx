@@ -2,13 +2,16 @@ import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import nookies from 'nookies';
+import { useState } from 'react';
 import { firebaseAdmin } from '../firebaseAdmin';
 import { logout } from '../utils';
 
 const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
   const router = useRouter();
+  const [isLoding, setIsLoading] = useState(false); // エラーの有無
 
   const onLogout = async () => {
+    setIsLoading(true);
     await logout(); // ログアウトさせる
     router.push('/login'); // ログインページへ遷移させる
   };
@@ -26,8 +29,14 @@ const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
           <div className='card-body'>
             <h2 className='fs-6'>email: {email}</h2>
             <div className='mt-3 text-center'>
-              <button className='btn btn-primary' onClick={onLogout}>
-                Logout
+              <button className='btn btn-primary' onClick={onLogout} disabled={isLoding}>
+                <span className={isLoding ? 'd-none' : ''}>Logout</span>
+                <span
+                  className={'spinner-border spinner-border-sm ' + (isLoding ? '' : 'd-none')}
+                  role='status'
+                >
+                  <span className='visually-hidden'>Loading...</span>
+                </span>
               </button>
             </div>
           </div>

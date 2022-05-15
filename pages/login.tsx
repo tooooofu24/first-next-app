@@ -13,14 +13,17 @@ const LoginPage: NextPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); // エラーメッセージ
   const [hasError, setHasError] = useState(false); // エラーの有無
+  const [isLoding, setIsLoading] = useState(false); // エラーの有無
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault(); // デフォルトの<form />の挙動を無効にする
+    setIsLoading(true);
     try {
       await login(email, password); // email・passwordを使ってログイン
     } catch (e) {
       setError(e.message);
       setHasError(true);
+      setIsLoading(false);
     }
     router.push('/dashboard'); // ダッシュボードページへ遷移させる
   };
@@ -65,8 +68,14 @@ const LoginPage: NextPage = () => {
               </div>
 
               <div className='mt-3 text-center'>
-                <button className='btn btn-primary' type='submit'>
-                  Login
+                <button className='btn btn-primary' type='submit' disabled={isLoding}>
+                  <span className={isLoding ? 'd-none' : ''}>Login</span>
+                  <span
+                    className={'spinner-border spinner-border-sm ' + (isLoding ? '' : 'd-none')}
+                    role='status'
+                  >
+                    <span className='visually-hidden'>Loading...</span>
+                  </span>
                 </button>
               </div>
             </form>
