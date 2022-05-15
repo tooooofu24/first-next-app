@@ -1,17 +1,13 @@
 import admin from 'firebase-admin';
-import * as serviceAccount from './serviceAccountKey.json';
 
-const params = {
-  type: serviceAccount.type,
-  projectId: serviceAccount.project_id,
-  privateKeyId: serviceAccount.private_key_id,
-  privateKey: serviceAccount.private_key,
-  clientEmail: serviceAccount.client_email,
-  clientId: serviceAccount.client_id,
-  authUri: serviceAccount.auth_uri,
-  tokenUri: serviceAccount.token_uri,
-  authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-  clientC509CertUrl: serviceAccount.client_x509_cert_url,
+/**
+ * @description Firebaseの管理画面から取得した管理者アカウント情報
+ * @note 環境変数は`.env.local`ファイルに定義しています
+ */
+const serviceAccount: admin.ServiceAccount = {
+  projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+  privateKey: (process.env.FIREBASE_ADMIN_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
 };
 
 /**
@@ -21,5 +17,5 @@ const params = {
 export const firebaseAdmin =
   admin.apps[0] ||
   admin.initializeApp({
-    credential: admin.credential.cert(params),
+    credential: admin.credential.cert(serviceAccount),
   });
