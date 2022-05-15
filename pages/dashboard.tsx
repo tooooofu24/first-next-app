@@ -10,7 +10,7 @@ const DashboardPage: NextPage<{ email: string }> = ({ email }) => {
   const router = useRouter();
 
   const onLogout = async () => {
-    // await logout(); // ログアウトさせる
+    await logout(); // ログアウトさせる
     router.push('/login'); // ログインページへ遷移させる
   };
 

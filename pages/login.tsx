@@ -13,7 +13,7 @@ const LoginPage: NextPage = () => {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault(); // デフォルトの<form />の挙動を無効にする
-    // await login(email, password); // email・passwordを使ってログイン
+    await login(email, password); // email・passwordを使ってログイン
     router.push('/dashboard'); // ダッシュボードページへ遷移させる
   };
 

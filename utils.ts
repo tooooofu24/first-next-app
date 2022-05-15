@@ -10,6 +10,7 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
  */
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  // apiKey: 'AIzaSyBs_M4SsjCGZji8xwYuvB5MOTSrr9cBS-0',
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
@@ -22,6 +23,8 @@ export const firebaseConfig = {
  * @description FirebaseAppを返す
  */
 export const getFirebaseApp = (): FirebaseApp | undefined => {
+  console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
   if (typeof window === 'undefined') return; // バックエンドで実行されないようにする
 
   return getApps()[0] || initializeApp(firebaseConfig);
