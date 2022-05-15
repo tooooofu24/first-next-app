@@ -1,5 +1,4 @@
-import type { FirebaseApp } from 'firebase/app';
-import { getApps, initializeApp } from 'firebase/app';
+import { FirebaseApp, FirebaseError, getApps, initializeApp } from 'firebase/app';
 import type { Auth as FirebaseAuth } from 'firebase/auth';
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
@@ -37,24 +36,32 @@ export const getFirebaseAuth = (): FirebaseAuth => {
 /**
  * @description メールアドレスとパスワードでログイン
  */
-export const login = async (email: string, password: string) => {
+export const login = async (email: string, password: string): Promise<void> => {
   // FirebaseAuthを取得する
   const auth = getFirebaseAuth();
 
   // メールアドレスとパスワードでログインする
-  const result = await signInWithEmailAndPassword(auth, email, password);
-
-  // セッションIDを作成するためのIDを作成する
-  const id = await result.user.getIdToken();
-
-  // Cookieにセッションを付与するようにAPIを投げる
-  await fetch('/api/session', { method: 'POST', body: JSON.stringify({ id }) });
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    // セッションIDを作成するためのIDを作成する
+    const id = await result.user.getIdToken();
+    // Cookieにセッションを付与するようにAPIを投げる
+    await fetch('/api/session', { method: 'POST', body: JSON.stringify({ id }) });
+  } catch (e) {
+    if (e instanceof FirebaseError) {
+      // 認証エラー
+      throw new Error('メールアドレスかパスワードが違います。');
+    } else {
+      // その他エラー
+      throw new Error('不明なエラーです。開発者にお問合せください。');
+    }
+  }
 };
 
 /**
  * @description ログアウトさせる
  */
-export const logout = async () => {
+export const logout = async (): Promise<void> => {
   // セッションCookieを削除するため、Firebase SDKでなくREST APIでログアウトさせる
   await fetch('/api/sessionLogout', { method: 'POST' });
 };
